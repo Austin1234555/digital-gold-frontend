@@ -1,33 +1,29 @@
 import axios from "axios";
 
-// Backend
 const API_BASE = "https://digital-gold-backend.onrender.com";
 
-// Common axios instance
 const api = axios.create({
   baseURL: API_BASE,
 });
 
-// ---- AUTH ----
+// ---------- AUTH ----------
 export const signup = (name, email, password) =>
   api.post(`/auth/signup?name=${name}&email=${email}&password=${password}`);
 
 export const login = (email, password) =>
   api.post(`/auth/login?email=${email}&password=${password}`);
 
-// ---- WALLET ----
-export const getWallet = (userId) =>
-  api.get(`/wallet?userId=${userId}`);
+// ---------- WALLET ----------
+export const getWallet = (userId) => api.get(`/wallet/${userId}`);
 
-// ---- LIVE PRICE ----
-export const getLatestPrice = () =>
-  api.get(`/price/latest`);
+// ---------- PRICE ----------
+export const getLatestPrice = () => api.get(`/price/latest`);
 
-// ---- RAZORPAY ----
+// ---------- RAZORPAY ----------
 export const createRazorpayOrder = (userId, amount, method) =>
-  api.post(`/razorpay/create-order`, { userId, amount, method });
+  api.post(`/razorpay/order`, { userId, amount, method });
 
-export const confirmRazorpayPayment = (data) =>
-  api.post(`/razorpay/confirm-payment`, data);
+export const confirmRazorpayPayment = (payload) =>
+  api.post(`/razorpay/verify`, payload);
 
 export default api;
