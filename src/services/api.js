@@ -1,28 +1,31 @@
+// src/services/api.js
 import axios from "axios";
 
-const API_BASE_URL = "https://digital-gold-backend.onrender.com";
+const API_BASE = "https://digital-gold-backend.onrender.com";
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_BASE,
+  withCredentials: true,
 });
 
-// Authentication
-export const registerAPI = (data) => api.post("/auth/register", data);
-export const loginAPI = (data) => api.post("/auth/login", data);
+// ---------------- AUTH ----------------
+export const signup = (name, email, password) =>
+  api.post(`/auth/signup?name=${name}&email=${email}&password=${password}`);
 
-// User Profile
-export const getProfileAPI = () => api.get("/user/profile");
+export const login = (email, password) =>
+  api.post(`/auth/login?email=${email}&password=${password}`);
 
-// Wallet (OLD name used in project)
-export const getWallet = () => api.get("/wallet");
+export const getProfile = () =>
+  api.get("/user/profile");
 
-// Wallet (NEW name used in some components)
-export const getWalletAPI = () => api.get("/wallet");
+// ---------------- GOLD ----------------
+export const buyGold = (amount) =>
+  api.post(`/gold/buy?amount=${amount}`);
 
-// Gold Operations
-export const buyGoldAPI = (data) => api.post("/gold/buy", data);
+export const getTransactions = () =>
+  api.get("/transactions/all");
 
-// Transactions
-export const getTransactionsAPI = () => api.get("/transactions/all");
+// (OPTIONAL) If wallet endpoint is added later
+// export const getWallet = () => api.get("/wallet");
 
 export default api;
