@@ -41,18 +41,13 @@ export default function Dashboard() {
   }, []);
 
   const refresh = async () => {
-    try {
-      const walletRes = await getWallet(user.id);
-      setWallet(walletRes.data || 0);
+    const walletRes = await getWallet(user.id);
+    setWallet(walletRes.data || 0);
 
-      const priceRes = await getLatestPrice();
-      setPrice(priceRes.data.goldPricePerGram);
-    } catch (error) {
-      console.error("Dashboard Init Error:", error);
-    }
+    const priceRes = await getLatestPrice();
+    setPrice(priceRes.data.goldPricePerGram);
   };
 
-  // ----------- RAZORPAY PAYMENT ----------
   const startPayment = async () => {
     if (!amount || amount <= 0) {
       alert("Enter a valid amount");
@@ -61,8 +56,12 @@ export default function Dashboard() {
     setLoadingPay(true);
 
     try {
-      const orderRes = await createRazorpayOrder(user.id, amount, method);
-      const { keyId, orderId, amountInPaise } = orderRes.data;
+      // ---------- Create Razorpay Order ----------
+      const orderRes = await createRazorpayOrder(user.id, Number(amount), method);
+
+      const keyId = orderRes.data.keyId;
+      const orderId = orderRes.data.orderId;
+      const amountInPaise = orderRes.data.amountInPaise;
 
       const options = {
         key: keyId,
@@ -92,11 +91,8 @@ export default function Dashboard() {
             await refresh();
             setOpen(false);
           } catch (e) {
-            console.error("CONFIRM PAYMENT ERROR:", e.response?.data || e.message);
-            alert(
-              "Payment success but backend confirmation failed: " +
-                (e.response?.data?.message || e.response?.data || e.message)
-            );
+            console.error(e);
+            alert("Payment was successful but backend confirmation failed.");
           }
         },
         modal: {
@@ -107,11 +103,8 @@ export default function Dashboard() {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
-      console.error("ORDER CREATION ERROR:", err.response?.data || err.message);
-      alert(
-        "Payment could not be started: " +
-        (err.response?.data?.message || err.response?.data || err.message)
-      );
+      console.error("Order Error:", err);
+      alert("Payment could not be started:\n" + JSON.stringify(err.response?.data || err));
     } finally {
       setLoadingPay(false);
     }
@@ -124,6 +117,7 @@ export default function Dashboard() {
 
   return (
     <Box minHeight="100vh" bgcolor="#F2F6FF">
+      {/* NAVBAR */}
       <AppBar position="static" sx={{ bgcolor: "#002970", py: 1.5 }}>
         <Toolbar>
           <Typography sx={{ flexGrow: 1, fontWeight: 700, fontSize: 22 }}>
@@ -144,6 +138,7 @@ export default function Dashboard() {
         </Toolbar>
       </AppBar>
 
+      {/* HERO SECTION */}
       <Box
         sx={{
           background: "linear-gradient(90deg, #002970, #0050C8)",
@@ -175,6 +170,7 @@ export default function Dashboard() {
         </Button>
       </Box>
 
+      {/* PROFILE CARD */}
       <Box
         sx={{
           mt: -3,
@@ -203,6 +199,7 @@ export default function Dashboard() {
         </Box>
       </Box>
 
+      {/* PORTFOLIO */}
       <Box p={4}>
         <Typography sx={{ fontSize: 24, fontWeight: 700, mb: 2 }}>
           Your Portfolio
@@ -212,9 +209,7 @@ export default function Dashboard() {
           <Typography variant="h5" sx={{ fontWeight: 700 }}>
             Gold Balance
           </Typography>
-          <Typography
-            sx={{ fontSize: 36, fontWeight: 800, color: "#002970", mt: 1 }}
-          >
+          <Typography sx={{ fontSize: 36, fontWeight: 800, color: "#002970", mt: 1 }}>
             {wallet.toFixed(5)} g
           </Typography>
           <Typography sx={{ mt: 1, fontSize: 18 }}>
@@ -232,6 +227,7 @@ export default function Dashboard() {
         </Button>
       </Box>
 
+      {/* PAYMENT POPUP */}
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogContent sx={{ width: 360 }}>
           <Typography variant="h6" fontWeight={700}>
@@ -251,15 +247,27 @@ export default function Dashboard() {
           <Box display="flex" justifyContent="space-around">
             <PaymentsIcon
               onClick={() => setMethod("UPI")}
-              sx={{ fontSize: 38, cursor: "pointer", color: method === "UPI" ? "#002970" : "gray" }}
+              sx={{
+                fontSize: 38,
+                cursor: "pointer",
+                color: method === "UPI" ? "#002970" : "gray",
+              }}
             />
             <CreditCardIcon
               onClick={() => setMethod("CARD")}
-              sx={{ fontSize: 38, cursor: "pointer", color: method === "CARD" ? "#002970" : "gray" }}
+              sx={{
+                fontSize: 38,
+                cursor: "pointer",
+                color: method === "CARD" ? "#002970" : "gray",
+              }}
             />
             <AccountBalanceIcon
               onClick={() => setMethod("NETBANKING")}
-              sx={{ fontSize: 38, cursor: "pointer", color: method === "NETBANKING" ? "#002970" : "gray" }}
+              sx={{
+                fontSize: 38,
+                cursor: "pointer",
+                color: method === "NETBANKING" ? "#002970" : "gray",
+              }}
             />
           </Box>
 
