@@ -1,3 +1,5 @@
+import { login } from "../services/api";
+
 const signin = async () => {
   try {
     const res = await login(email, password);
