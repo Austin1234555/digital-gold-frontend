@@ -41,14 +41,18 @@ export default function Dashboard() {
   }, []);
 
   const refresh = async () => {
-    const walletRes = await getWallet(user.id);
-    setWallet(walletRes.data || 0);
+    try {
+      const walletRes = await getWallet(user.id);
+      setWallet(walletRes.data || 0);
 
-    const priceRes = await getLatestPrice();
-    setPrice(priceRes.data.goldPricePerGram);
+      const priceRes = await getLatestPrice();
+      setPrice(priceRes.data.goldPricePerGram);
+    } catch (error) {
+      console.error("Dashboard Init Error:", error);
+    }
   };
 
-  // ----------- RAZORPAY ----------
+  // ----------- RAZORPAY PAYMENT ----------
   const startPayment = async () => {
     if (!amount || amount <= 0) {
       alert("Enter a valid amount");
@@ -88,8 +92,11 @@ export default function Dashboard() {
             await refresh();
             setOpen(false);
           } catch (e) {
-            console.error(e);
-            alert("Payment success but backend confirmation failed.");
+            console.error("CONFIRM PAYMENT ERROR:", e.response?.data || e.message);
+            alert(
+              "Payment success but backend confirmation failed: " +
+                (e.response?.data?.message || e.response?.data || e.message)
+            );
           }
         },
         modal: {
@@ -100,8 +107,11 @@ export default function Dashboard() {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
-      console.error(err);
-      alert("Payment could not be started.");
+      console.error("ORDER CREATION ERROR:", err.response?.data || err.message);
+      alert(
+        "Payment could not be started: " +
+        (err.response?.data?.message || err.response?.data || err.message)
+      );
     } finally {
       setLoadingPay(false);
     }
@@ -112,10 +122,8 @@ export default function Dashboard() {
     return null;
   }
 
-
   return (
     <Box minHeight="100vh" bgcolor="#F2F6FF">
-      {/* NAVBAR */}
       <AppBar position="static" sx={{ bgcolor: "#002970", py: 1.5 }}>
         <Toolbar>
           <Typography sx={{ flexGrow: 1, fontWeight: 700, fontSize: 22 }}>
@@ -136,7 +144,6 @@ export default function Dashboard() {
         </Toolbar>
       </AppBar>
 
-      {/* HERO SECTION */}
       <Box
         sx={{
           background: "linear-gradient(90deg, #002970, #0050C8)",
@@ -168,7 +175,6 @@ export default function Dashboard() {
         </Button>
       </Box>
 
-      {/* PROFILE */}
       <Box
         sx={{
           mt: -3,
@@ -197,7 +203,6 @@ export default function Dashboard() {
         </Box>
       </Box>
 
-      {/* PORTFOLIO */}
       <Box p={4}>
         <Typography sx={{ fontSize: 24, fontWeight: 700, mb: 2 }}>
           Your Portfolio
@@ -227,7 +232,6 @@ export default function Dashboard() {
         </Button>
       </Box>
 
-      {/* PAYMENT POPUP */}
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogContent sx={{ width: 360 }}>
           <Typography variant="h6" fontWeight={700}>
