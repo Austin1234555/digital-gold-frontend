@@ -10,16 +10,14 @@ const api = axios.create({
 export const registerAPI = (data) => api.post("/auth/register", data);
 export const loginAPI = (data) => api.post("/auth/login", data);
 
-// USER PROFILE
+// PROFILE
 export const getProfileAPI = () => api.get("/user/profile");
 
-// BUY GOLD
+// GOLD
 export const buyGoldAPI = (data) => api.post("/gold/buy", data);
-
-// TRANSACTIONS
 export const getTransactionsAPI = () => api.get("/transactions/all");
 
-// 💰 WALLET (New — added because Vercel error was expecting this)
+// 💰 WALLET (needed for Vercel build)
 export const getWalletAPI = () => api.get("/wallet");
 
 export default api;
