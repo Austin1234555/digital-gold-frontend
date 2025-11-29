@@ -1,27 +1,19 @@
 import axios from "axios";
 
-const API_BASE = "https://digital-gold-backend.onrender.com";
+const API_BASE_URL = "https://digital-gold-backend.onrender.com";
 
+const api = axios.create({
+  baseURL: API_BASE_URL,
+});
 
-export const signup = (name, email, password) =>
-  axios.post(`${API_BASE}/auth/signup?name=${name}&email=${email}&password=${password}`);
+export const registerAPI = (data) => api.post("/auth/register", data);
 
-export const login = (email, password) =>
-  axios.post(`${API_BASE}/auth/login?email=${email}&password=${password}`);
+export const loginAPI = (data) => api.post("/auth/login", data);
 
-export const getWallet = (userId) =>
-  axios.get(`${API_BASE}/wallet?userId=${userId}`);
+export const getProfileAPI = () => api.get("/user/profile");
 
-export const getLatestPrice = () =>
-  axios.get(`${API_BASE}/partner/get-price`);
+export const buyGoldAPI = (data) => api.post("/gold/buy", data);
 
-// ---- RAZORPAY ----
-export const createRazorpayOrder = (userId, amount, method) =>
-  axios.post(`${API_BASE}/payment/razorpay-order`, {
-    userId,
-    amount,
-    method,
-  });
+export const getTransactionsAPI = () => api.get("/transactions/all");
 
-export const confirmRazorpayPayment = (payload) =>
-  axios.post(`${API_BASE}/payment/razorpay-confirm`, payload);
+export default api;
