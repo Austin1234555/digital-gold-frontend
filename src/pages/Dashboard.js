@@ -107,7 +107,11 @@ export default function Dashboard() {
     }
   };
 
-  if (!user) return null;
+  if (!user || !user.id) {
+    window.location.href = "/login";
+    return null;
+  }
+
 
   return (
     <Box minHeight="100vh" bgcolor="#F2F6FF">
